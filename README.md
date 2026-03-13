@@ -1,7 +1,10 @@
-<<<<<<< HEAD
-# RtProxy
-Self-contained installer for a lightweight Nginx reverse proxy with automatic TLS management using acme.sh
-=======
+# RTProxy
+
+Self-contained installer for a lightweight Nginx reverse proxy with
+automatic TLS management using acme.sh
+
+------------------------------------------------------------------------
+
 # RTProxy -- Lightweight Automated Reverse Proxy with TLS
 
 RTProxy is a **lightweight reverse proxy automation framework** designed
@@ -38,19 +41,7 @@ RTProxy was designed with the following priorities:
 
 # High-Level Architecture
 
-                Internet / LAN
-                       |
-                       |
-                +-------------+
-                |   RTProxy   |
-                |   Nginx     |
-                +-------------+
-                     |
-        +------------+------------+
-        |                         |
-
-Internal Service A Internal Service B http://10.0.0.5:3000
-https://10.0.0.10:8443 (Grafana) (Proxmox)
+  ![Architecture](images/RT-Proxy.jpg)
 
 RTProxy performs:
 
@@ -68,22 +59,6 @@ For **maximum performance and network isolation**, RTProxy requires
 
 This design separates **north‑south traffic** (client access) from
 **east‑west traffic** (backend services).
-
-Recommended architecture:
-
-                Internet / LAN
-                        |
-                        |
-                eth0 (Ingress Interface)
-                        |
-                +-----------------+
-                |     RTProxy     |
-                |      Nginx      |
-                +-----------------+
-                        |
-                eth1 (Backend Interface)
-                        |
-               Internal Service Network
 
 Benefits:
 
@@ -162,12 +137,12 @@ sudo bash install-rtproxy.sh
 
 The installer performs:
 
-1.  Dependency installation
-2.  Nginx installation and configuration
-3.  acme.sh installation
-4.  CLI tool installation
-5.  Directory structure creation
-6.  Logging configuration
+1.  Dependency installation\
+2.  Nginx installation and configuration\
+3.  acme.sh installation\
+4.  CLI tool installation\
+5.  Directory structure creation\
+6.  Logging configuration\
 7.  TLS configuration
 
 ------------------------------------------------------------------------
@@ -214,9 +189,9 @@ Example:
 
 RTProxy automatically:
 
-1.  requests a TLS certificate
-2.  installs the certificate
-3.  generates nginx configuration
+1.  requests a TLS certificate\
+2.  installs the certificate\
+3.  generates nginx configuration\
 4.  reloads nginx
 
 Result:
@@ -295,6 +270,132 @@ Example:
     ACME_SERVER="letsencrypt"
     WARN_DAYS="14"
     CRIT_DAYS="7"
+
+------------------------------------------------------------------------
+
+# Cloudflare DNS-01 Validation Setup
+
+RTProxy supports issuing TLS certificates using **DNS-01 validation
+through Cloudflare**.
+
+This mode is recommended when:
+
+-   services are **internal only**
+-   port **80 cannot be opened**
+-   infrastructure must remain **private**
+-   certificates are required for **management platforms**
+
+Examples:
+
+    grafana.internal.example.com
+    proxmox.lab.example.com
+    netbox.mgmt.example.com
+
+DNS-01 validation allows Let's Encrypt to verify domain ownership by
+checking a temporary **TXT record in DNS**.
+
+------------------------------------------------------------------------
+
+## Creating a Cloudflare API Token
+
+Open the Cloudflare dashboard:
+
+    https://dash.cloudflare.com/profile/api-tokens
+
+Select:
+
+    Create Token
+
+Choose:
+
+    Custom Token
+
+------------------------------------------------------------------------
+
+## Required Token Permissions
+
+Configure the token with the following permissions.
+
+  Permission           Purpose
+  -------------------- ------------------------------------
+  Zone → DNS → Edit    Create and remove ACME TXT records
+  Zone → Zone → Read   Discover zone configuration
+
+Example permission set:
+
+    Zone.DNS:Edit
+    Zone.Zone:Read
+
+------------------------------------------------------------------------
+
+## Restrict Token Scope
+
+For security reasons the token should be limited to the specific DNS
+zone used by RTProxy.
+
+Example:
+
+    example.com
+
+Avoid granting access to **All Zones** unless absolutely necessary.
+
+------------------------------------------------------------------------
+
+## Configure RTProxy
+
+Edit the configuration file:
+
+    /etc/rtproxy/config.env
+
+Add:
+
+    DNS_PROVIDER="dns_cf"
+    CF_Token=YOUR_CLOUDFLARE_API_TOKEN
+
+Example:
+
+    DNS_PROVIDER="dns_cf"
+    CF_Token=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+------------------------------------------------------------------------
+
+## DNS Validation Workflow
+
+During certificate issuance the following process occurs:
+
+1.  RTProxy requests a certificate via **acme.sh**\
+2.  acme.sh creates a TXT record in Cloudflare
+
+Example:
+
+    _acme-challenge.example.com
+
+3.  Cloudflare publishes the TXT record\
+4.  Let's Encrypt queries the DNS record\
+5.  Domain ownership is validated\
+6.  Certificate is issued\
+7.  acme.sh removes the TXT record automatically
+
+This process normally completes within **10-30 seconds** depending on
+DNS propagation.
+
+------------------------------------------------------------------------
+
+## Manual DNS Challenge Test
+
+You can verify Cloudflare integration using:
+
+    acme.sh --issue \
+      --dns dns_cf \
+      -d test.example.com
+
+During validation a TXT record will appear:
+
+    _acme-challenge.test.example.com
+
+Check propagation with:
+
+    dig TXT _acme-challenge.test.example.com
 
 ------------------------------------------------------------------------
 
@@ -406,4 +507,3 @@ MIT License
 # Author
 
 Luca Biancorosso
->>>>>>> b524a99 (Initial Release)
