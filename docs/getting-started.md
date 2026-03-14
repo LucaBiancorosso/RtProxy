@@ -1,4 +1,4 @@
-  ![GettingStarted](images/gettingstarted.png)
+  ![GettingStarted](../images/gettingstarted.png)
 
 This guide walks through the initial RTProxy deployment step by step, from preparing the server to publishing the first HTTPS service.
 
@@ -64,7 +64,7 @@ During installation, be prepared to provide:
 If you are using internal-only services, DNS validation through Cloudflare is the recommended option.
 
 Here is a an installation screenshot
-  ![Install](images/install.png)
+  ![Install](../images/Install.png)
 
 ## 6. Choose Staging or Production
 
