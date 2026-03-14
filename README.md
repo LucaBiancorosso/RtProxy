@@ -1,512 +1,418 @@
-
- ![Architecture](images/rt-logo.png)
-
 # RTProxy by Luca Biancorosso
 
-Self-contained installer for a lightweight Nginx reverse proxy with
-automatic TLS management using acme.sh
+![Architecture](images/rt-logo.png)
 
-------------------------------------------------------------------------
+Self-contained installer for a lightweight Nginx reverse proxy with automatic TLS management using acme.sh
+
+---
 
 ## RTProxy -- Lightweight Automated Reverse Proxy with TLS
 
-RTProxy is a **lightweight reverse proxy automation framework** designed
-to quickly publish internal services over HTTPS with minimal operational
-effort.
+RTProxy is a **lightweight reverse proxy automation framework** designed to quickly publish internal services over HTTPS with minimal operational effort.
 
 It combines:
 
--   **Nginx** (reverse proxy engine)
--   **acme.sh** (ACME client for TLS certificates)
--   **Let's Encrypt** (certificate authority)
--   **Cloudflare DNS‑01 validation**
--   A simple **CLI management tool (`rtproxy`)**
+- **Nginx** (reverse proxy engine)
+- **acme.sh** (ACME client for TLS certificates)
+- **Let's Encrypt** (certificate authority)
+- **Cloudflare DNS-01 validation**
+- A simple **CLI management tool (`rtproxy`)**
 
-RTProxy is intended for environments where you want **secure HTTPS
-publishing without the complexity of full ingress controllers such as
-Traefik or Kubernetes ingress**.
+RTProxy is intended for environments where you want **secure HTTPS publishing without the complexity of full ingress controllers such as Traefik or Kubernetes ingress**.
 
-------------------------------------------------------------------------
+---
 
 ## Key Design Goals
 
 RTProxy was designed with the following priorities:
 
-• Minimal operational complexity\
-• Fully automated certificate lifecycle\
-• CLI-based management (no manual nginx editing)\
-• Works for **internal and external services**\
-• Easy deployment on **clean Linux servers**\
-• Minimal dependencies\
-• Secure by default
+- Minimal operational complexity
+- Fully automated certificate lifecycle
+- CLI-based management with no manual Nginx editing
+- Support for **internal and external services**
+- Easy deployment on **clean Linux servers**
+- Minimal dependencies
+- Secure by default
 
-------------------------------------------------------------------------
+---
 
-# High-Level Architecture
+## High-Level Architecture
 
-  ![Architecture](images/RT-Proxy.jpg)
+![Architecture](images/RT-Proxy.jpg)
 
 RTProxy performs:
 
-• TLS certificate issuance\
-• Nginx configuration generation\
-• HTTPS redirect configuration\
-• automatic certificate renewal
+- TLS certificate issuance
+- Nginx configuration generation
+- HTTPS redirect configuration
+- Automatic certificate renewal
 
-------------------------------------------------------------------------
+---
 
-# Performance Architecture
+## Performance Architecture
 
-For **maximum performance and network isolation**, RTProxy requires
-**two Ethernet interfaces**.
+For **maximum performance and network isolation**, RTProxy requires **two Ethernet interfaces**.
 
 This design separates client access from backend services.
 
 Benefits:
 
-• improved packet processing efficiency\
-• separation of security zones\
-• easier firewall policy control\
-• reduced contention between ingress and backend traffic\
-• higher performance under load\
-• zero-trust principle
+- Improved packet processing efficiency
+- Separation of security zones
+- Easier firewall policy control
+- Reduced contention between ingress and backend traffic
+- Higher performance under load
+- Zero-trust principle
 
+---
 
-# Requirements
+## Requirements
 
-## Supported OS
+### Supported OS
 
--   Debian 12+ ( prefered os )
--   Ubuntu 22.04+
--   Minimal Linux server installation
+- Debian 12+ (**preferred OS**)
+- Ubuntu 22.04+
+- Minimal Linux server installation
 
-## Hardware Requirements
+### Hardware Requirements
 
 Minimum:
 
--   2 CPU cores
--   2 GB RAM
--   10 GB disk
+- 2 CPU cores
+- 2 GB RAM
+- 10 GB disk
 
 Recommended:
 
--   4 CPU cores
--   4 GB RAM
+- 4 CPU cores
+- 4 GB RAM
 
-## Network Requirements
+### Network Requirements
 
 RTProxy **requires two Ethernet interfaces**:
 
-| **Interface**  | **Purpose**  |
-|------------|------------|
-| eth0  | public- ingress interface   |
-| eth1  | Internal service network   |
+| Interface | Purpose |
+|---|---|
+| eth0 | Public ingress interface |
+| eth1 | Internal service network |
 
-This separation provides **maximum performance and cleaner
-architecture**.
+This separation provides **maximum performance and cleaner architecture**.
 
-## Other Requirements
+### Other Requirements
 
--   root access
--   outbound internet connectivity
--   DNS control for the domains used
--   Cloudflare account for DNS validation
+- Root access
+- Outbound internet connectivity
+- DNS control for the domains used
+- Cloudflare account for DNS validation
 
-------------------------------------------------------------------------
+---
 
-# Components Installed
+## Components Installed
 
-The installer automatically installs and configures the following
-components.
+The installer automatically installs and configures the following components.
 
-  Component            | Description
-  ---------------------|-------------------------------------|
-  Nginx                | Reverse proxy engine|
-  acme.sh              | ACME certificate management|
-  rtproxy CLI          | Management tool|
-  Nginx configuration  | Automatic reverse proxy definitions|
-  Certificate storage  | TLS certificate management|
+| Component | Description |
+|---|---|
+| Nginx | Reverse proxy engine |
+| acme.sh | ACME certificate management |
+| rtproxy CLI | Management tool |
+| Nginx configuration | Automatic reverse proxy definitions |
+| Certificate storage | TLS certificate management |
 
+---
 
-------------------------------------------------------------------------
-
-# Installation
+## Installation
 
 Run the installer:
 
-``` bash
+```bash
 sudo bash install-rtproxy.sh
 ```
 
 The installer performs:
 
-1.  Dependency installation\
-2.  Nginx installation and configuration\
-3.  acme.sh installation\
-4.  CLI tool installation\
-5.  Directory structure creation\
-6.  Logging configuration\
-7.  TLS configuration
+1. Dependency installation
+2. Nginx installation and configuration
+3. acme.sh installation
+4. CLI tool installation
+5. Directory structure creation
+6. Logging configuration
+7. TLS configuration
 
-------------------------------------------------------------------------
+For a full walkthrough, screenshots, first-run guidance, and validation steps, see the [Getting Started Guide](docs/getting-started.md).
 
-# Directory Layout
+---
 
-    /etc/rtproxy/
-        config.env
+## Directory Layout
 
-    /etc/nginx/rtproxy/
-        sites/
+```text
+/etc/rtproxy/
+    config.env
 
-    /etc/nginx/ssl/
-        certificates
+/etc/nginx/rtproxy/
+    sites/
 
-    /var/www/rtproxy/
-        ACME challenges
+/etc/nginx/ssl/
+    certificates
 
-    /opt/acme.sh/
-        ACME client
+/var/www/rtproxy/
+    ACME challenges
 
-    /usr/local/bin/rtproxy
-    /usr/local/sbin/rtproxy
+/opt/acme.sh/
+    ACME client
 
-------------------------------------------------------------------------
+/usr/local/bin/rtproxy
+/usr/local/sbin/rtproxy
+```
 
-# CLI Usage
+---
+
+## CLI Usage
 
 Main command:
 
-``` bash
+```bash
 rtproxy
 ```
 
-------------------------------------------------------------------------
+### Add a Service
 
-# Add a Service
-
-    rtproxy add <fqdn> <backend>
+```text
+rtproxy add <fqdn> <backend>
+```
 
 Example:
 
-    rtproxy add grafana.example.com http://10.10.0.5:3000
+```text
+rtproxy add grafana.example.com http://10.10.0.5:3000
+```
 
 RTProxy automatically:
 
-1.  requests a TLS certificate\
-2.  installs the certificate\
-3.  generates nginx configuration\
-4.  reloads nginx
+1. Requests a TLS certificate
+2. Installs the certificate
+3. Generates Nginx configuration
+4. Reloads Nginx
 
 Result:
 
-    https://grafana.example.com
+```text
+https://grafana.example.com
+```
 
-------------------------------------------------------------------------
+### Add HTTPS Backend
 
-# Add HTTPS Backend
+```text
+rtproxy add proxmox.example.com https://10.10.0.10:8006
+```
 
-    rtproxy add proxmox.example.com https://10.10.0.10:8006
+RTProxy automatically disables backend certificate validation for internal services.
 
-RTProxy automatically disables backend certificate validation for
-internal services.
+### Remove Service
 
-------------------------------------------------------------------------
-
-# Remove Service
-
-    rtproxy remove <fqdn>
+```text
+rtproxy remove <fqdn>
+```
 
 Example:
 
-    rtproxy remove grafana.example.com
+```text
+rtproxy remove grafana.example.com
+```
 
 Removes:
 
--   nginx configuration
--   certificate files
--   ACME entries
+- Nginx configuration
+- Certificate files
+- ACME entries
 
-------------------------------------------------------------------------
+### List Services
 
-# List Services
-
-    rtproxy list
+```text
+rtproxy list
+```
 
 Example output:
 
-    grafana.example.com
-    proxmox.example.com
-    netbox.example.com
+```text
+grafana.example.com
+proxmox.example.com
+netbox.example.com
+```
 
-------------------------------------------------------------------------
-
-# Certificate Renewal
+### Certificate Renewal
 
 Certificates are renewed using:
 
-    rtproxy renew-all
+```text
+rtproxy renew-all
+```
 
 Internally executes:
 
-    acme.sh --cron
+```text
+acme.sh --cron
+```
 
 Recommended cron:
 
-    0 2 * * * root rtproxy renew-all
+```text
+0 2 * * * root rtproxy renew-all
+```
 
-------------------------------------------------------------------------
+---
 
-# Configuration
+## Configuration
 
 Main configuration file:
 
-    /etc/rtproxy/config.env
+```text
+/etc/rtproxy/config.env
+```
 
 Example:
 
-    MODE="internal"
-    INGRESS_IF="eth0"
-    BACKEND_IF="eth1"
-    LE_EMAIL="admin@example.com"
-    WEBROOT="/var/www/rtproxy"
-    ACME_HOME="/opt/acme.sh"
-    ACME_SERVER="letsencrypt"
-    WARN_DAYS="14"
-    CRIT_DAYS="7"
+```text
+MODE="internal"
+INGRESS_IF="eth0"
+BACKEND_IF="eth1"
+LE_EMAIL="admin@example.com"
+WEBROOT="/var/www/rtproxy"
+ACME_HOME="/opt/acme.sh"
+ACME_SERVER="letsencrypt"
+WARN_DAYS="14"
+CRIT_DAYS="7"
+```
 
-------------------------------------------------------------------------
+For the full DNS setup and ACME guidance, see the [Cloudflare DNS-01 Guide](docs/cloudflare.md).
 
-# Cloudflare DNS-01 Validation Setup
+---
 
-RTProxy supports issuing TLS certificates using **DNS-01 validation
-through Cloudflare**.
-
-This mode is recommended when:
-
--   services are **internal only**
--   port **80 cannot be opened**
--   infrastructure must remain **private**
--   certificates are required for **management platforms**
-
-Examples:
-
-    grafana.internal.example.com
-    proxmox.lab.example.com
-    netbox.mgmt.example.com
-
-DNS-01 validation allows Let's Encrypt to verify domain ownership by
-checking a temporary **TXT record in DNS**.
-
-------------------------------------------------------------------------
-
-## Creating a Cloudflare API Token
-
-Open the Cloudflare dashboard:
-
-    https://dash.cloudflare.com/profile/api-tokens
-
-Select:
-
-    Create Token
-
-Choose:
-
-    Custom Token
-
-------------------------------------------------------------------------
-
-## Required Token Permissions
-
-Configure the token with the following permissions.
-
-  Permission           |Purpose
-  -------------------- |------------------------------------
-  Zone → DNS → Edit    |Create and remove ACME TXT records
-  Zone → Zone → Read   |Discover zone configuration
-
-Example permission set:
-
-    Zone.DNS:Edit
-    Zone.Zone:Read
-
-------------------------------------------------------------------------
-
-## Restrict Token Scope
-
-For security reasons the token should be limited to the specific DNS
-zone used by RTProxy.
-
-Example:
-
-    example.com
-
-Avoid granting access to **All Zones** unless absolutely necessary.
-
-------------------------------------------------------------------------
-
-## Configure RTProxy
-
-Edit the configuration file:
-
-    /etc/rtproxy/config.env
-
-Add:
-
-    DNS_PROVIDER="dns_cf"
-    CF_Token=YOUR_CLOUDFLARE_API_TOKEN
-
-Example:
-
-    DNS_PROVIDER="dns_cf"
-    CF_Token=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-------------------------------------------------------------------------
-
-## DNS Validation Workflow
-
-During certificate issuance the following process occurs:
-
-1.  RTProxy requests a certificate via **acme.sh**\
-2.  acme.sh creates a TXT record in Cloudflare
-
-Example:
-
-    _acme-challenge.example.com
-
-3.  Cloudflare publishes the TXT record\
-4.  Let's Encrypt queries the DNS record\
-5.  Domain ownership is validated\
-6.  Certificate is issued\
-7.  acme.sh removes the TXT record automatically
-
-This process normally completes within **10-30 seconds** depending on
-DNS propagation.
-
-------------------------------------------------------------------------
-
-## Manual DNS Challenge Test
-
-You can verify Cloudflare integration using:
-
-    acme.sh --issue \
-      --dns dns_cf \
-      -d test.example.com
-
-During validation a TXT record will appear:
-
-    _acme-challenge.test.example.com
-
-Check propagation with:
-
-    dig TXT _acme-challenge.test.example.com
-
-------------------------------------------------------------------------
-
-# Security Model
+## Security Model
 
 RTProxy follows several security best practices:
 
-• HTTPS enforced automatically\
-• TLS private keys stored with restricted permissions\
-• backend networks isolated from public ingress\
-• minimal software footprint\
-• no web UI attack surface
+- HTTPS enforced automatically
+- TLS private keys stored with restricted permissions
+- Backend networks isolated from public ingress
+- Minimal software footprint
+- No web UI attack surface
 
 Key permissions:
 
-    chmod 600 private keys
-    chmod 644 certificates
-    chmod 600 config.env
+```text
+chmod 600 private keys
+chmod 644 certificates
+chmod 600 config.env
+```
 
-------------------------------------------------------------------------
+---
 
-# Example Use Cases
+## Example Use Cases
 
 RTProxy is ideal for publishing internal services such as:
 
--   Grafana
--   NetBox
--   AWX
--   Rundeck
--   Proxmox
--   NAS interfaces
--   monitoring dashboards
+- Grafana
+- NetBox
+- AWX
+- Rundeck
+- Proxmox
+- NAS interfaces
+- Monitoring dashboards
 
 It works especially well for:
 
-• homelabs\
-• infrastructure management portals\
-• DevOps environments\
-• internal tooling
+- Homelabs
+- Infrastructure management portals
+- DevOps environments
+- Internal tooling
 
-------------------------------------------------------------------------
+---
 
-# Comparison
+## Comparison
 
-  Feature                  |RTProxy      |Traefik   |Caddy
-  ------------------------ |------------ |--------- |--------
-  Complexity               |Low          |Medium    |Low
-  Automation               |Yes          |Yes       |Yes
-  Operational footprint    |Very small   |Medium    |Medium
-  Kubernetes integration   |No           |Yes       |No
-  CLI management           |Yes          |Limited   |No
+| Feature | RTProxy | Traefik | Caddy |
+|---|---|---|---|
+| Complexity | Low | Medium | Low |
+| Automation | Yes | Yes | Yes |
+| Operational footprint | Very small | Medium | Medium |
+| Kubernetes integration | No | Yes | No |
+| CLI management | Yes | Limited | No |
 
-RTProxy is intended for **simple infrastructure publishing scenarios**
-rather than large orchestrated environments.
+RTProxy is intended for **simple infrastructure publishing scenarios** rather than large orchestrated environments.
 
-------------------------------------------------------------------------
+---
 
-# Logging
+## Logging
 
 Logs are stored in:
 
-    /var/log/rtproxy.log
-    /var/log/rtproxy-check.log
-    /var/log/rtproxy-install.log
+```text
+/var/log/rtproxy.log
+/var/log/rtproxy-check.log
+/var/log/rtproxy-install.log
+```
 
 Example:
 
-    tail -f /var/log/rtproxy.log
+```text
+tail -f /var/log/rtproxy.log
+```
 
-------------------------------------------------------------------------
+---
 
-# Troubleshooting
+## Troubleshooting
 
-Check nginx configuration:
+Check Nginx configuration:
 
-    nginx -t
+```text
+nginx -t
+```
 
-Check nginx status:
+Check Nginx status:
 
-    systemctl status nginx
+```text
+systemctl status nginx
+```
 
 Check ACME configuration:
 
-    /opt/acme.sh/
+```text
+/opt/acme.sh/
+```
 
-------------------------------------------------------------------------
+For a step-by-step first deployment workflow, see the [Getting Started Guide](docs/getting-started.md).
 
-# Roadmap
+---
+
+## Documentation
+
+- [Getting Started Guide](docs/getting-started.md)
+- [Cloudflare DNS-01 Guide](docs/cloudflare.md)
+
+---
+
+## Roadmap
 
 Future improvements may include:
 
-• multi-node cluster support\
-• additional DNS providers\
-• wildcard certificate support\
-• backend health checks\
-• Prometheus metrics\
-• rate limiting\
-• authentication layer\
-• high availability mode
+- Multi-node cluster support
+- Additional DNS providers
+- Wildcard certificate support
+- Backend health checks
+- Prometheus metrics
+- Rate limiting
+- Authentication layer
+- High availability mode
 
-------------------------------------------------------------------------
+---
 
-# License
+## License
 
 MIT License
 
-------------------------------------------------------------------------
+---
 
-# Author
+## Author
 
 Luca Biancorosso
