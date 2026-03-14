@@ -1,11 +1,14 @@
-# RTProxy
+
+ ![Architecture](images/rt-logo.png)
+
+# RTProxy by Luca Biancorosso
 
 Self-contained installer for a lightweight Nginx reverse proxy with
 automatic TLS management using acme.sh
 
 ------------------------------------------------------------------------
 
-# RTProxy -- Lightweight Automated Reverse Proxy with TLS
+## RTProxy -- Lightweight Automated Reverse Proxy with TLS
 
 RTProxy is a **lightweight reverse proxy automation framework** designed
 to quickly publish internal services over HTTPS with minimal operational
@@ -16,7 +19,7 @@ It combines:
 -   **Nginx** (reverse proxy engine)
 -   **acme.sh** (ACME client for TLS certificates)
 -   **Let's Encrypt** (certificate authority)
--   Optional **Cloudflare DNS‑01 validation**
+-   **Cloudflare DNS‑01 validation**
 -   A simple **CLI management tool (`rtproxy`)**
 
 RTProxy is intended for environments where you want **secure HTTPS
@@ -25,7 +28,7 @@ Traefik or Kubernetes ingress**.
 
 ------------------------------------------------------------------------
 
-# Key Design Goals
+## Key Design Goals
 
 RTProxy was designed with the following priorities:
 
@@ -57,8 +60,7 @@ RTProxy performs:
 For **maximum performance and network isolation**, RTProxy requires
 **two Ethernet interfaces**.
 
-This design separates **north‑south traffic** (client access) from
-**east‑west traffic** (backend services).
+This design separates client access from backend services.
 
 Benefits:
 
@@ -66,15 +68,15 @@ Benefits:
 • separation of security zones\
 • easier firewall policy control\
 • reduced contention between ingress and backend traffic\
-• higher performance under load
+• higher performance under load\
+• zero-trust principle
 
-------------------------------------------------------------------------
 
 # Requirements
 
 ## Supported OS
 
--   Debian 12+
+-   Debian 12+ ( prefered os )
 -   Ubuntu 22.04+
 -   Minimal Linux server installation
 
@@ -95,10 +97,10 @@ Recommended:
 
 RTProxy **requires two Ethernet interfaces**:
 
-  Interface   Purpose
-  ----------- ----------------------------
-  eth0        Public / ingress interface
-  eth1        Internal service network
+| **Interface**  | **Purpose**  |
+|------------|------------|
+| eth0  | public- ingress interface   |
+| eth1  | Internal service network   |
 
 This separation provides **maximum performance and cleaner
 architecture**.
@@ -108,7 +110,7 @@ architecture**.
 -   root access
 -   outbound internet connectivity
 -   DNS control for the domains used
--   optional: Cloudflare account for DNS validation
+-   Cloudflare account for DNS validation
 
 ------------------------------------------------------------------------
 
@@ -117,13 +119,14 @@ architecture**.
 The installer automatically installs and configures the following
 components.
 
-  Component             Description
-  --------------------- -------------------------------------
-  Nginx                 Reverse proxy engine
-  acme.sh               ACME certificate management
-  rtproxy CLI           Management tool
-  Nginx configuration   Automatic reverse proxy definitions
-  Certificate storage   TLS certificate management
+  Component            | Description
+  ---------------------|-------------------------------------|
+  Nginx                | Reverse proxy engine|
+  acme.sh              | ACME certificate management|
+  rtproxy CLI          | Management tool|
+  Nginx configuration  | Automatic reverse proxy definitions|
+  Certificate storage  | TLS certificate management|
+
 
 ------------------------------------------------------------------------
 
@@ -316,10 +319,10 @@ Choose:
 
 Configure the token with the following permissions.
 
-  Permission           Purpose
-  -------------------- ------------------------------------
-  Zone → DNS → Edit    Create and remove ACME TXT records
-  Zone → Zone → Read   Discover zone configuration
+  Permission           |Purpose
+  -------------------- |------------------------------------
+  Zone → DNS → Edit    |Create and remove ACME TXT records
+  Zone → Zone → Read   |Discover zone configuration
 
 Example permission set:
 
@@ -440,13 +443,13 @@ It works especially well for:
 
 # Comparison
 
-  Feature                  RTProxy      Traefik   Caddy
-  ------------------------ ------------ --------- --------
-  Complexity               Low          Medium    Low
-  Automation               Yes          Yes       Yes
-  Operational footprint    Very small   Medium    Medium
-  Kubernetes integration   No           Yes       No
-  CLI management           Yes          Limited   No
+  Feature                  |RTProxy      |Traefik   |Caddy
+  ------------------------ |------------ |--------- |--------
+  Complexity               |Low          |Medium    |Low
+  Automation               |Yes          |Yes       |Yes
+  Operational footprint    |Very small   |Medium    |Medium
+  Kubernetes integration   |No           |Yes       |No
+  CLI management           |Yes          |Limited   |No
 
 RTProxy is intended for **simple infrastructure publishing scenarios**
 rather than large orchestrated environments.
