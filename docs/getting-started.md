@@ -1,4 +1,8 @@
-  ![GettingStarted](../images/gettingstarted.png)
+![Status](https://img.shields.io/badge/status-active-success)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Platform](https://img.shields.io/badge/platform-linux-lightgrey)
+
+![GettingStarted](../images/gettingstarted.png)
 
 This guide walks through the initial RTProxy deployment step by step, from preparing the server to publishing the first HTTPS service.
 
